@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#111827" />
+<title>Warehouse Operations Pro</title>
+<style>
+:root{--bg:#0b1220;--card:#111827;--card2:#172033;--text:#f8fafc;--muted:#94a3b8;--accent:#22c55e;--accent2:#38bdf8;--danger:#ef4444;--warn:#f59e0b;--border:#263246}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#09101c,#0b1220 30%,#0f172a);color:var(--text);min-height:100vh}
+button,input,select,textarea{font:inherit}.app{max-width:760px;margin:auto;padding:16px 14px 90px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.brand h1{font-size:20px;margin:0}.brand small{color:var(--muted)}
+.card{background:rgba(17,24,39,.96);border:1px solid var(--border);border-radius:18px;padding:14px;margin:12px 0;box-shadow:0 12px 30px rgba(0,0,0,.18)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.btn{border:0;border-radius:14px;padding:14px 12px;background:#1f2937;color:white;font-weight:800;min-height:54px}.btn:active{transform:scale(.98)}.primary{background:var(--accent);color:#052e16}.secondary{background:#0ea5e9;color:#06283a}.danger{background:var(--danger)}.warn{background:var(--warn);color:#3a2200}.ghost{background:#182235;border:1px solid #304059}.mode{padding:18px 12px;min-height:80px;font-size:16px}.mode span{display:block;font-size:11px;color:#cbd5e1;font-weight:600;margin-top:4px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.kpi{background:var(--card2);padding:12px;border-radius:14px;text-align:center}.kpi strong{display:block;font-size:22px}.kpi small{color:var(--muted)}
+label{display:block;font-size:12px;color:#cbd5e1;margin:12px 2px 5px;font-weight:700}input,select,textarea{width:100%;border-radius:12px;border:1px solid #334155;background:#0b1322;color:white;padding:12px;outline:none}textarea{min-height:72px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:#38bdf8}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.toolbar{display:flex;gap:8px;overflow:auto;padding-bottom:4px}.chip{white-space:nowrap;padding:8px 11px;border-radius:999px;border:1px solid #334155;background:#172033;color:#e2e8f0;font-size:12px;font-weight:700}.chip.active{background:#14532d;border-color:#22c55e}
+.hidden{display:none!important}.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px}.section-title h2{font-size:17px;margin:0}.muted{color:var(--muted);font-size:12px}.queue-item,.history-item{border:1px solid #2b3a50;background:#0e1728;border-radius:13px;padding:10px;margin:8px 0}.queue-item b,.history-item b{font-size:14px}.queue-item small,.history-item small{color:#94a3b8}.status{display:inline-block;font-size:10px;font-weight:900;padding:4px 7px;border-radius:999px;margin-left:6px}.queued{background:#334155}.completed{background:#14532d}.exception{background:#7c2d12}.inprogress{background:#075985}
+.bottom{position:fixed;left:0;right:0;bottom:0;background:rgba(6,10,18,.96);backdrop-filter:blur(14px);border-top:1px solid #253247}.nav{max-width:760px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);padding:8px}.nav button{background:transparent;border:0;color:#94a3b8;font-size:11px;padding:7px 2px}.nav button.active{color:#4ade80;font-weight:800}.nav b{display:block;font-size:18px;margin-bottom:2px}
+#barcodeBox,#qrBox{background:white;border-radius:12px;padding:12px;text-align:center;overflow:auto}#barcode{max-width:100%;height:auto}#qrcode{display:flex;justify-content:center}.notice{padding:9px 11px;border-radius:11px;background:#13243a;border-left:4px solid #38bdf8;font-size:12px;color:#dbeafe}.empty{color:#64748b;text-align:center;padding:18px 0}.right{display:flex;gap:8px}.small{padding:9px 10px;min-height:auto;font-size:12px}.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:82px;background:#052e16;color:#dcfce7;border:1px solid #166534;padding:10px 14px;border-radius:999px;font-size:12px;z-index:50;opacity:0;pointer-events:none;transition:.2s}.toast.show{opacity:1}.photo-preview{width:100%;max-height:220px;object-fit:contain;border-radius:10px;background:#020617;margin-top:8px}
+@media(max-width:520px){.grid3{grid-template-columns:1fr}.row{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(3,1fr)}.kpi strong{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><div class="brand"><h1>Warehouse Operations Pro</h1><small>Advanced Mode • Local-first prototype</small></div><button class="btn ghost small" onclick="resetDemo()">Reset Demo</button></div>
+
+  <section id="homeView" class="view">
+    <div class="card">
+      <div class="section-title"><h2>Today's Shift</h2><span class="muted" id="todayLabel"></span></div>
+      <div class="kpis" style="margin-top:12px"><div class="kpi"><strong id="kCompleted">0</strong><small>Completed</small></div><div class="kpi"><strong id="kRemaining">0</strong><small>Queue</small></div><div class="kpi"><strong id="kExceptions">0</strong><small>Exceptions</small></div></div>
+    </div>
+    <div class="card"><h2 style="font-size:17px;margin-top:0">Start Work</h2><div class="grid3">
+      <button class="btn mode primary" onclick="startMode('Pallet Retrieval')">Pallet Retrieval<span>Retrieve reserve pallets</span></button>
+      <button class="btn mode secondary" onclick="startMode('Replenishment')">Replenishment<span>Reserve → pick destination</span></button>
+      <button class="btn mode warn" onclick="startMode('Full Pallet Move')">Full Pallet Move<span>Reserve → staging/dock</span></button>
+    </div></div>
+    <div class="card"><div class="grid"><button class="btn ghost" onclick="go('queue')">Task Queue</button><button class="btn ghost" onclick="go('scan')">Scan / Generate</button></div></div>
+  </section>
+
+  <section id="workView" class="view hidden">
+    <div class="card">
+      <div class="section-title"><h2 id="workTitle">Work Task</h2><span class="status inprogress">IN PROGRESS</span></div>
+      <div class="toolbar" style="margin-top:10px"><span class="chip" id="modeChip"></span><span class="chip">Auto timestamp</span><span class="chip">Offline save</span></div>
+      <div class="row"><div><label>Task #</label><input id="taskNo" placeholder="Scan or enter task number"></div><div><label>Pallet / iLPN</label><input id="palletNo" placeholder="Pallet or iLPN"></div></div>
+      <div class="row"><div><label>From Location</label><input id="fromLoc" placeholder="Reserve / source"></div><div><label>To / Destination</label><input id="toLoc" placeholder="Pick / staging / dock"></div></div>
+      <div class="row"><div><label>Item #</label><input id="itemNo" placeholder="Optional"></div><div><label>Quantity</label><input id="qty" inputmode="numeric" placeholder="Optional"></div></div>
+      <label>Notes</label><textarea id="notes" placeholder="Damage, blocked location, missing inventory, etc."></textarea>
+      <label>Photo</label><input id="photo" type="file" accept="image/*" capture="environment"><img id="photoPreview" class="photo-preview hidden" alt="preview">
+      <div class="grid" style="margin-top:14px"><button class="btn danger" onclick="completeTask(true)">Exception</button><button class="btn primary" onclick="completeTask(false)">Complete & Next</button></div>
+    </div>
+  </section>
+
+  <section id="queueView" class="view hidden">
+    <div class="card"><div class="section-title"><h2>Task Queue</h2><button class="btn secondary small" onclick="addQueueBatch()">Add Tasks</button></div>
+      <label>Default Mode for New Tasks</label><select id="queueMode"><option>Pallet Retrieval</option><option>Replenishment</option><option>Full Pallet Move</option></select>
+      <label>Paste task numbers (comma, space, or new line separated)</label><textarea id="queueInput" placeholder="100123, 100124, 100125"></textarea>
+      <button class="btn primary" style="width:100%;margin-top:10px" onclick="addQueueBatch()">Add to Queue</button>
+    </div>
+    <div class="card"><div class="section-title"><h2>Waiting</h2><button class="btn ghost small" onclick="clearQueue()">Clear Queue</button></div><div id="queueList"></div></div>
+  </section>
+
+  <section id="scanView" class="view hidden">
+    <div class="card"><h2 style="font-size:17px;margin-top:0">Scan / Generate</h2><div class="notice">Generator automatically removes dashes before creating the code. Example: <b>01-02-003-04 → 010200304</b>.</div>
+      <label>Value</label><input id="codeValue" placeholder="Enter or paste barcode/QR value" oninput="updateCleaned()"><div class="muted" style="margin-top:6px">Cleaned: <b id="cleanedValue">—</b></div>
+      <div class="grid" style="margin-top:12px"><button class="btn primary" onclick="makeBarcode()">Generate Barcode</button><button class="btn secondary" onclick="makeQR()">Generate QR</button></div>
+    </div>
+    <div class="card hidden" id="barcodeCard"><div class="section-title"><h2>Barcode</h2><button class="btn ghost small" onclick="printCode('barcodeBox')">Print</button></div><div id="barcodeBox"><svg id="barcode"></svg></div></div>
+    <div class="card hidden" id="qrCard"><div class="section-title"><h2>QR Code</h2><button class="btn ghost small" onclick="printCode('qrBox')">Print</button></div><div id="qrBox"><div id="qrcode"></div></div></div>
+    <div class="card"><div class="section-title"><h2>Camera Scanner</h2><button class="btn secondary small" onclick="startScanner()">Start Scanner</button></div><div class="notice" style="margin-top:8px">Camera scanning requires browser camera permission. On some phones it works best when the app is hosted from HTTPS or localhost.</div><div id="reader" style="margin-top:10px"></div><div id="scanResult" class="muted"></div></div>
+  </section>
+
+  <section id="historyView" class="view hidden">
+    <div class="card"><div class="section-title"><h2>History</h2><div class="right"><button class="btn ghost small" onclick="exportCSV()">CSV</button><button class="btn ghost small" onclick="window.print()">Print/PDF</button></div></div>
+      <label>Search</label><input id="historySearch" placeholder="Task, pallet, location, mode..." oninput="renderHistory()">
+      <div class="toolbar" style="margin-top:10px"><button class="chip active" onclick="setHistoryFilter('All',this)">All</button><button class="chip" onclick="setHistoryFilter('Pallet Retrieval',this)">Retrieval</button><button class="chip" onclick="setHistoryFilter('Replenishment',this)">Replen</button><button class="chip" onclick="setHistoryFilter('Full Pallet Move',this)">Full Pallet</button></div>
+    </div><div class="card"><div id="historyList"></div></div>
+  </section>
+
+  <section id="moreView" class="view hidden">
+    <div class="card"><h2 style="font-size:17px;margin-top:0">Settings / Backup</h2><div class="grid"><button class="btn ghost" onclick="backupJSON()">Backup Data</button><button class="btn ghost" onclick="document.getElementById('restoreFile').click()">Restore Data</button></div><input id="restoreFile" class="hidden" type="file" accept="application/json" onchange="restoreJSON(this.files[0])"><button class="btn danger" style="width:100%;margin-top:10px" onclick="wipeAll()">Erase All Local Data</button></div>
+    <div class="card"><h2 style="font-size:17px;margin-top:0">Advanced Behaviors Included</h2><div class="muted" style="line-height:1.8">Shared queue • mode-aware tasks • Complete & Next • exception status • local history • search/filter • CSV export • backup/restore • timestamps • dash-stripping barcode/QR generator • photo attachment • camera scanner integration.</div></div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+<div class="bottom"><div class="nav"><button id="nav-home" class="active" onclick="go('home')"><b>⌂</b>Home</button><button id="nav-queue" onclick="go('queue')"><b>☷</b>Queue</button><button id="nav-scan" onclick="go('scan')"><b>▣</b>Scan</button><button id="nav-history" onclick="go('history')"><b>◷</b>History</button><button id="nav-more" onclick="go('more')"><b>⋯</b>More</button></div></div>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+const KEY='warehouse_ops_pro_v1';
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{queue:[],history:[],current:null};
+let activeMode='Pallet Retrieval',historyFilter='All',scanner=null,currentPhoto=null;
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1700)}
+function go(name){document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));$(name+'View').classList.remove('hidden');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));$('nav-'+name)?.classList.add('active');if(name==='queue')renderQueue();if(name==='history')renderHistory();if(name==='home')renderKPIs()}
+function startMode(mode,task=''){activeMode=mode;state.current={mode,task};$('workTitle').textContent=mode;$('modeChip').textContent=mode;['taskNo','palletNo','fromLoc','toLoc','itemNo','qty','notes'].forEach(id=>$(id).value='');$('taskNo').value=task;currentPhoto=null;$('photo').value='';$('photoPreview').classList.add('hidden');$('workView').classList.remove('hidden');document.querySelectorAll('.view').forEach(v=>{if(v.id!=='workView')v.classList.add('hidden')});document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));$('taskNo').focus();}
+function addQueueBatch(){const raw=$('queueInput').value.trim();if(!raw)return toast('Enter task numbers first');const mode=$('queueMode').value;const tasks=raw.split(/[\s,;]+/).map(x=>x.trim()).filter(Boolean);const seen=new Set(state.queue.map(q=>q.task));let added=0;tasks.forEach(task=>{if(!seen.has(task)){state.queue.push({id:crypto.randomUUID?.()||Date.now()+Math.random(),task,mode,status:'Queued',created:new Date().toISOString()});seen.add(task);added++}});$('queueInput').value='';save();toast(added+' task(s) added')}
+function renderQueue(){const el=$('queueList');if(!state.queue.length){el.innerHTML='<div class="empty">No queued tasks.</div>';return}el.innerHTML=state.queue.map((q,i)=>`<div class="queue-item"><div class="section-title"><div><b>${esc(q.task)}</b><span class="status queued">QUEUED</span><br><small>${esc(q.mode)}</small></div><div class="right"><button class="btn primary small" onclick="openQueue(${i})">Start</button><button class="btn ghost small" onclick="removeQueue(${i})">×</button></div></div></div>`).join('')}
+function openQueue(i){const q=state.queue[i];if(!q)return;state.queue.splice(i,1);save();startMode(q.mode,q.task)}
+function removeQueue(i){state.queue.splice(i,1);save()}
+function clearQueue(){if(confirm('Clear all queued tasks?')){state.queue=[];save()}}
+function completeTask(isException){const task=$('taskNo').value.trim();if(!task)return toast('Task number is required');const rec={id:crypto.randomUUID?.()||Date.now()+Math.random(),mode:activeMode,task,pallet:$('palletNo').value.trim(),from:$('fromLoc').value.trim(),to:$('toLoc').value.trim(),item:$('itemNo').value.trim(),qty:$('qty').value.trim(),notes:$('notes').value.trim(),photo:currentPhoto||'',status:isException?'Exception':'Completed',completed:new Date().toISOString()};state.history.unshift(rec);save();toast(isException?'Saved as exception':'Task completed');if(state.queue.length){const q=state.queue.shift();save();startMode(q.mode,q.task)}else{go('home')}}
+function renderKPIs(){const today=new Date().toDateString();const todays=state.history.filter(r=>new Date(r.completed).toDateString()===today);$('kCompleted').textContent=todays.filter(r=>r.status==='Completed').length;$('kRemaining').textContent=state.queue.length;$('kExceptions').textContent=todays.filter(r=>r.status==='Exception').length;$('todayLabel').textContent=new Date().toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'})}
+function setHistoryFilter(f,btn){historyFilter=f;document.querySelectorAll('#historyView .chip').forEach(x=>x.classList.remove('active'));btn.classList.add('active');renderHistory()}
+function renderHistory(){const q=($('historySearch')?.value||'').toLowerCase();let rows=state.history.filter(r=>historyFilter==='All'||r.mode===historyFilter).filter(r=>JSON.stringify(r).toLowerCase().includes(q));const el=$('historyList');if(!rows.length){el.innerHTML='<div class="empty">No matching records.</div>';return}el.innerHTML=rows.map(r=>`<div class="history-item"><div class="section-title"><div><b>${esc(r.task)}</b><span class="status ${r.status==='Exception'?'exception':'completed'}">${r.status.toUpperCase()}</span><br><small>${esc(r.mode)} • ${new Date(r.completed).toLocaleString()}</small></div><button class="btn ghost small" onclick="reopen('${r.id}')">Reopen</button></div><div class="muted" style="margin-top:7px">Pallet: ${esc(r.pallet||'—')} • ${esc(r.from||'—')} → ${esc(r.to||'—')} ${r.item?'• Item '+esc(r.item):''} ${r.qty?'• Qty '+esc(r.qty):''}</div>${r.notes?`<div class="muted" style="margin-top:5px">${esc(r.notes)}</div>`:''}${r.photo?`<img src="${r.photo}" class="photo-preview" alt="task photo">`:''}</div>`).join('')}
+function reopen(id){const r=state.history.find(x=>x.id===id);if(!r)return;startMode(r.mode,r.task);$('palletNo').value=r.pallet;$('fromLoc').value=r.from;$('toLoc').value=r.to;$('itemNo').value=r.item;$('qty').value=r.qty;$('notes').value=r.notes;currentPhoto=r.photo||null;if(currentPhoto){$('photoPreview').src=currentPhoto;$('photoPreview').classList.remove('hidden')}}
+function cleanCode(v){return (v||'').replace(/-/g,'').trim()}
+function updateCleaned(){$('cleanedValue').textContent=cleanCode($('codeValue').value)||'—'}
+function makeBarcode(){const v=cleanCode($('codeValue').value);if(!v)return toast('Enter a value');if(typeof JsBarcode==='undefined')return toast('Barcode library needs internet on first load');JsBarcode('#barcode',v,{format:'CODE128',displayValue:true,margin:12,height:80});$('barcodeCard').classList.remove('hidden');$('cleanedValue').textContent=v}
+function makeQR(){const v=cleanCode($('codeValue').value);if(!v)return toast('Enter a value');if(typeof QRCode==='undefined')return toast('QR library needs internet on first load');$('qrcode').innerHTML='';new QRCode($('qrcode'),{text:v,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});$('qrCard').classList.remove('hidden');$('cleanedValue').textContent=v}
+function printCode(id){const w=window.open('','_blank');w.document.write('<html><body style="text-align:center;padding:30px">'+$(id).innerHTML+'</body></html>');w.document.close();w.print()}
+async function startScanner(){if(typeof Html5Qrcode==='undefined')return toast('Scanner library needs internet on first load');try{if(scanner){await scanner.stop().catch(()=>{});scanner.clear()}scanner=new Html5Qrcode('reader');const cams=await Html5Qrcode.getCameras();if(!cams.length)return toast('No camera found');await scanner.start({facingMode:'environment'},{fps:10,qrbox:{width:250,height:160}},decoded=>{$('scanResult').textContent='Scanned: '+decoded;$('codeValue').value=decoded;updateCleaned();scanner.stop().catch(()=>{});toast('Code scanned')},()=>{});}catch(e){$('scanResult').textContent='Scanner error: '+e;}}
+function exportCSV(){const cols=['completed','status','mode','task','pallet','from','to','item','qty','notes'];const lines=[cols.join(',')].concat(state.history.map(r=>cols.map(c=>'"'+String(r[c]||'').replaceAll('"','""')+'"').join(',')));download('warehouse-history.csv',lines.join('\n'),'text/csv')}
+function backupJSON(){download('warehouse-operations-backup.json',JSON.stringify(state,null,2),'application/json')}
+function restoreJSON(file){if(!file)return;const rd=new FileReader();rd.onload=()=>{try{state=JSON.parse(rd.result);save();toast('Backup restored')}catch{toast('Invalid backup file')}};rd.readAsText(file)}
+function wipeAll(){if(confirm('Erase all queue and history data on this device?')){state={queue:[],history:[],current:null};save();go('home')}}
+function resetDemo(){state={queue:[{task:'100231',mode:'Pallet Retrieval',status:'Queued',created:new Date().toISOString()},{task:'100232',mode:'Replenishment',status:'Queued',created:new Date().toISOString()},{task:'100233',mode:'Full Pallet Move',status:'Queued',created:new Date().toISOString()}],history:[]};save();go('home');toast('Demo queue loaded')}
+function download(name,data,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+$('photo').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{currentPhoto=r.result;$('photoPreview').src=currentPhoto;$('photoPreview').classList.remove('hidden')};r.readAsDataURL(f)});
+function renderAll(){renderKPIs();renderQueue();renderHistory()}renderAll();
+</script>
+</body></html>
